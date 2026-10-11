@@ -879,7 +879,7 @@ subject to using exactly the game's real total minutes and a {MAX_MIN:.0f}-minut
   limited that player's minutes (foul trouble, matchups, a coach's trust) beyond what's in the box score.
 
 A {MAX_MIN:.0f}-minute recommendation (a player's absolute physical limit) is intentionally rare — it shows up in
-roughly 1 in 25 player-games in this data, reserved for cases where a player's trailing value is unusually
+roughly 1 in 14 player-games in this data, reserved for cases where a player's trailing value is unusually
 strong *and* his recent workload has been unusually light. Most nights, the fatigue penalty pulls every
 player's recommendation well below the cap.
             """
