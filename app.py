@@ -763,6 +763,7 @@ with streamlit_analytics.track(unsafe_password="knicks2026"):
             "third championship. Click through the season, then check whether his real rotation decisions "
             "matched what a fatigue-adjusted, data-driven optimizer says was ideal."
         )
+        st.caption("By **Vihaan Vinjamuri**, IBDP2")
     with top_r:
         st.write("")
         if st.button("📖 How this was built", width="stretch"):
