@@ -1,30 +1,31 @@
-team,conference,net_rating
-BOS,East,6.5
-CLE,East,5.5
-MIL,East,3.0
-ORL,East,2.5
-IND,East,2.0
-MIA,East,1.5
-PHI,East,1.0
-DET,East,1.0
-ATL,East,0.0
-CHI,East,-1.0
-TOR,East,-2.0
-BKN,East,-4.0
-CHA,East,-5.0
-WAS,East,-8.0
-OKC,West,7.0
-DEN,West,5.0
-HOU,West,4.0
-LAL,West,3.0
-SAS,West,2.0
-MIN,West,2.5
-MEM,West,1.5
-DAL,West,1.0
-LAC,West,1.0
-GSW,West,0.5
-SAC,West,-0.5
-PHX,West,-1.0
-POR,West,-3.0
-NOP,West,-4.5
-UTA,West,-6.0
+team,name,conference,wins,losses,net_rating
+OKC,Oklahoma City Thunder,West,64,18,11.2
+SAS,San Antonio Spurs,West,62,20,8.3
+DET,Detroit Pistons,East,60,22,8.2
+BOS,Boston Celtics,East,56,26,8.1
+NYK,New York Knicks,East,53,29,6.5
+HOU,Houston Rockets,West,52,30,5.4
+DEN,Denver Nuggets,West,54,28,5.2
+CHA,Charlotte Hornets,East,44,38,5.0
+CLE,Cleveland Cavaliers,East,52,30,4.1
+MIN,Minnesota Timberwolves,West,49,33,3.3
+TOR,Toronto Raptors,East,46,36,2.9
+ATL,Atlanta Hawks,East,46,36,2.4
+MIA,Miami Heat,East,43,39,2.2
+LAL,Los Angeles Lakers,West,53,29,1.8
+PHX,Phoenix Suns,West,45,37,1.5
+LAC,Los Angeles Clippers,West,42,40,1.2
+ORL,Orlando Magic,East,45,37,0.6
+PHI,Philadelphia 76ers,East,45,37,-0.1
+POR,Portland Trail Blazers,West,42,40,-0.3
+GSW,Golden State Warriors,West,37,45,-0.6
+NOP,New Orleans Pelicans,West,26,56,-4.5
+CHI,Chicago Bulls,East,31,51,-5.1
+DAL,Dallas Mavericks,West,26,56,-5.3
+MEM,Memphis Grizzlies,West,25,57,-5.9
+MIL,Milwaukee Bucks,East,32,50,-6.4
+IND,Indiana Pacers,East,19,63,-7.9
+UTA,Utah Jazz,West,22,60,-8.2
+SAC,Sacramento Kings,West,22,60,-10.1
+BKN,Brooklyn Nets,East,20,62,-10.3
+WAS,Washington Wizards,East,17,65,-11.7

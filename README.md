@@ -1,25 +1,28 @@
 # NBA Rotation Optimizer
 
-New York Knicks, 2025-26. A data pipeline and Streamlit app that reconstructs real on-court lineups and box scores from raw play-by-play data, then uses a fatigue-adjusted optimization model to check whether the team's real minutes decisions matched what the data says was optimal. It also includes a season simulator where you can build your own starting five and minutes distribution and simulate a full season through the playoffs.
+New York Knicks, 2024-25 and 2025-26. A data pipeline and Streamlit app that reconstructs real on-court lineups and box scores from raw play-by-play data, then uses a fatigue-adjusted optimization model to check whether the team's real minutes decisions matched what the data says was optimal.
 
-**Live app:** _add your deployed link here once it's up on Streamlit Community Cloud_
+**Live app:** https://nba-rotation-optimizer.streamlit.app
 
 ## What it does
 
-The season is told chronologically first, opening night through the championship, then the app digs into the numbers underneath it.
+**The season, as it happened.** Twelve story cards, opening night through the NBA Cup and the championship, every score and stat checked against basketball-reference box scores and AP/NBA.com coverage.
 
-**Was the real rotation optimal?** For every game, a CVXPY optimizer re-allocates that game's real total minutes across the roster to maximize predicted value minus a fatigue penalty, and the app compares that model-optimal allocation to what the coach actually did, at both the season and single-game level.
+**Was the real rotation optimal?** For every game, a CVXPY optimizer re-allocates that game's real total minutes to maximize predicted value minus a fatigue penalty, and the app compares that allocation to what the coach actually did, for the season and for any single game. Real rotations trail the optimum by 5.5 units per game under Mike Brown (2025-26), mostly value left on the table, versus 9.0 under Tom Thibodeau (2024-25), almost all extra fatigue cost.
 
-**Build your Knicks and simulate the season.** Pick a starting five, a sixth man, and how many minutes each plays. The app flags unrealistic position assignments (playing a point guard at center, for example) and simulates an 82-game season plus the play-in and playoffs based on your choices, reporting a final result and tips for adjusting your lineup.
+**Out-coach the coach.** Pick a real game, see each player's pre-game form and energy (exactly what the coach knew), split the minutes yourself, and get graded against the real coach and the model's best plan.
+
+**2K Mode.** Player cards with each player's NBA 2K27 overall and six attribute ratings (`data/reference/nba2k27_ratings.csv`). Pick a starting five and bench, set minutes, watch the team rating and projected record update live, then sim one season or 200 seasons on the Knicks' real schedule against the real 2025-26 league, with injuries, the play-in and a full playoff bracket.
 
 ## How the data pipeline works
 
-1. **Lineups from play-by-play.** Every substitution event (`SUB: <in> FOR <out>`) is walked in order from a detected starting five to reconstruct exactly which five players were on the court for every second of the game. The starting lineup is re-detected at the top of every period, not just once at tip-off, since a lineup change between quarters isn't logged as an in-game substitution.
-2. **Box scores from play-by-play.** Points, rebounds, assists, steals, blocks, turnovers, and fouls are aggregated directly from play-by-play events, independent of the lineup reconstruction, and checked against real final scores and season totals.
-3. **Calibration.** Minutes are lightly anchored to verified season totals (basketball-reference) to correct residual lineup-tracking noise.
-4. **The optimizer.** Each player's value coefficient blends their trailing (no-lookahead) on/off net rating with their trailing Game Score, both shrunk toward a neutral prior for small samples. A CVXPY program then re-allocates each game's real total minutes to maximize value minus a fatigue penalty based on recent workload, subject to a 48-minute per-player cap.
+1. **Lineups from play-by-play** (`src/parse_lineups.py`, `src/build_ratings_and_schedule.py`). Every substitution event is walked in order to reconstruct which five players were on the court for every second. The lineup is re-detected at the top of every period, since a change between quarters isn't logged as a substitution.
+2. **Box scores from play-by-play** (`src/build_boxscore_from_pbp_v2.py`). Points, rebounds, assists, steals, blocks, turnovers and fouls are aggregated event by event. Team points match the real final score in all 164 games, and every player's season per-game numbers match basketball-reference to within 0.1.
+3. **Exact minutes** (`src/correct_minutes_with_official_box.py`). In 34 of 164 games the tracker lost a player who played a whole quarter without recording a stat. Those games use the official basketball-reference minutes and plus-minus (`data/reference/official_box_minutes_corrections.csv`), each checked so minutes sum to 5 × game length and plus-minus sums to 5 × the final margin. Every game now totals exactly 240 (265/290 in overtime), and every player's games played and minutes per game match basketball-reference. (This replaces the older season-total calibration in `calibrate_to_verified*.py`.)
+4. **The optimizer** (`src/optimize_rotation.py`). Each player's value coefficient blends trailing (no-lookahead) on/off net rating with trailing Game Score per 48, shrunk toward a prior for small samples. A CVXPY program re-allocates each game's real total minutes to maximize value minus a fatigue penalty, with a 48-minute cap.
+5. **The simulator** (`sim2k.py`). Player impact is real Box Plus/Minus shrunk toward replacement level by minutes. Team rating is calibrated so the Knicks' real 2025-26 minutes reproduce their real +6.5 net rating. Each simulated season adds random breakout/slump years for players and rating swings for the other 29 teams, so no two seasons are the same. Games use the real 2025-26 net ratings of all 30 teams, with a spread fitted so those ratings reproduce the real 2025-26 records.
 
-Full formulas and reasoning are in the app itself under "How this was built."
+Full formulas are in the app under "How this was built."
 
 ## Running it locally
 
@@ -31,12 +34,9 @@ streamlit run app.py
 ## Project structure
 
 ```
-app.py                  Streamlit app
-src/                     data pipeline scripts (lineup parsing, box scores, calibration, the optimizer)
-data/processed/          reconstructed lineups, box scores, and optimizer results
-data/reference/           verified season stats, player positions, and illustrative team strength ratings used by the season simulator
+app.py              Streamlit app
+sim2k.py            2K Mode season simulator (plain Python, testable on its own)
+src/                data pipeline scripts
+data/processed/     reconstructed lineups, box scores, corrected per-game ratings, optimizer results
+data/reference/     official stats, schedules, team ratings and box-score corrections (basketball-reference)
 ```
-
-## What's real data vs. illustrative
-
-Lineups, box scores, and minutes are reconstructed from real play-by-play and checked against basketball-reference and national game coverage. The season simulator's other 29 teams are represented by a single illustrative net-rating number each, not real opposing players or real 2025-26 results, since the simulator is a what-if tool for the Knicks' own lineup choices, not a league-wide prediction model.

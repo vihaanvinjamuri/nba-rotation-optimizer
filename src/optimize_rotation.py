@@ -42,7 +42,9 @@ def prior_season_rates(prev_season_label):
     has no basis to tell anyone apart — it just splits minutes evenly,
     which is mathematically consistent with 0 information but looks wrong
     for a known quantity like Jalen Brunson on opening night."""
-    prev_path = PROC / f"NYK_{prev_season_label}_player_game_ratings_calibrated.csv"
+    prev_path = PROC / f"NYK_{prev_season_label}_player_game_ratings_corrected.csv"
+    if not prev_path.exists():
+        prev_path = PROC / f"NYK_{prev_season_label}_player_game_ratings_calibrated.csv"
     if not prev_path.exists():
         prev_path = PROC / f"NYK_{prev_season_label}_player_game_ratings.csv"
     if not prev_path.exists():
@@ -76,8 +78,14 @@ def prep_season(season_label, prior_season_label=None):
     # reconstruction had real errors (e.g. Karl-Anthony Towns showing 21.9
     # MPG when he actually played 31.0), and those numbers feed everything
     # downstream, so this isn't a cosmetic fix.
+    corrected_path = PROC / f"NYK_{season_label}_player_game_ratings_corrected.csv"
     calibrated_path = PROC / f"NYK_{season_label}_player_game_ratings_calibrated.csv"
-    if calibrated_path.exists():
+    if corrected_path.exists():
+        # Preferred: exact per-game minutes (tracker output, with the 34 games
+        # where it lost a player replaced by official box-score minutes and
+        # plus-minus). See correct_minutes_with_official_box.py.
+        df = pd.read_csv(corrected_path, parse_dates=["game_date"])
+    elif calibrated_path.exists():
         df = pd.read_csv(calibrated_path, parse_dates=["game_date"])
         df["minutes"] = df["minutes_calibrated"]
         df["net_rating_per48"] = df["net_rating_per48_calibrated"]
